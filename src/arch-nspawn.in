@@ -69,7 +69,7 @@ nspawn_args=(
 )
 
 if (( ${#cache_dirs[@]} == 0 )); then
-	mapfile -t cache_dirs < <(pacman-conf --config "${pac_conf:-$working_dir/etc/pacman.conf}" CacheDir)
+	mapfile -t cache_dirs < <(pacman-conf CacheDir)
 fi
 
 # shellcheck disable=2016
