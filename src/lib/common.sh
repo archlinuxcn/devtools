@@ -16,7 +16,7 @@ $DEVTOOLS_INCLUDE_COMMON_SH
 export LANG=C.UTF-8
 
 # Set buildtool properties
-export BUILDTOOL=devtools
+export BUILDTOOL=${BUILDTOOL:-devtools-archlinuxcn}
 export BUILDTOOLVER=@buildtoolver@
 
 # Set common properties
