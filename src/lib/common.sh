@@ -19,7 +19,7 @@ export LANG=C.UTF-8
 export SYSTEMD_TINT_BACKGROUND=no
 
 # Set buildtool properties
-export BUILDTOOL=devtools
+export BUILDTOOL=${BUILDTOOL:-devtools-archlinuxcn}
 export BUILDTOOLVER=@buildtoolver@
 
 # Set common properties
