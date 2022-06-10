@@ -16,7 +16,7 @@ $_INCLUDE_COMMON_SH
 export LANG=C
 
 # Set buildtool properties
-export BUILDTOOL=devtools
+export BUILDTOOL=${BUILDTOOL:-devtools-archlinuxcn}
 export BUILDTOOLVER=m4_devtools_version
 
 # check if messages are to be printed using color
