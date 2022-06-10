@@ -22,7 +22,7 @@ export SYSTEMD_TINT_BACKGROUND=no
 unset DEBUGINFOD_URLS
 
 # Set buildtool properties
-export BUILDTOOL=devtools
+export BUILDTOOL=${BUILDTOOL:-devtools-archlinuxcn}
 export BUILDTOOLVER=@buildtoolver@
 
 # Set common properties
