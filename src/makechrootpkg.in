@@ -59,6 +59,7 @@ usage() {
 	echo '-c         Clean the chroot before building'
 	echo '-d <dir>   Bind directory into build chroot as read-write'
 	echo '-D <dir>   Bind directory into build chroot as read-only'
+	echo '-t <dir[:opts]>   Mount a tmpfs at directory'
 	echo '-u         Update the working copy of the chroot before building'
 	echo '           This is useful for rebuilds without dirtying the pristine'
 	echo '           chroot'
@@ -275,12 +276,12 @@ move_products() {
 }
 # }}}
 
-while getopts 'hcur:I:l:nCTD:d:U:T:' arg; do
+while getopts 'hcur:I:l:nCTD:d:U:t:' arg; do
 	case "$arg" in
 		c) clean_first=1 ;;
 		D) bindmounts_ro+=("--bind-ro=$OPTARG") ;;
 		d) bindmounts_rw+=("--bind=$OPTARG") ;;
-		T) bindmounts_tmpfs+=("--tmpfs=$OPTARG") ;;
+		t) bindmounts_tmpfs+=("--tmpfs=$OPTARG") ;;
 		u) update_first=1 ;;
 		r) passeddir="$OPTARG" ;;
 		I) install_pkgs+=("$OPTARG") ;;
