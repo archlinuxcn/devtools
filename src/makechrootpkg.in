@@ -27,6 +27,7 @@ temp_chroot=0
 
 bindmounts_ro=()
 bindmounts_rw=()
+bindmounts_tmpfs=()
 
 copy=$USER
 [[ -n ${SUDO_USER:-} ]] && copy=$SUDO_USER
@@ -58,6 +59,7 @@ usage() {
 	echo '-c         Clean the chroot before building'
 	echo '-d <dir>   Bind directory into build chroot as read-write'
 	echo '-D <dir>   Bind directory into build chroot as read-only'
+	echo '-t <dir[:opts]>   Mount a tmpfs at directory'
 	echo '-u         Update the working copy of the chroot before building'
 	echo '           This is useful for rebuilds without dirtying the pristine'
 	echo '           chroot'
@@ -136,7 +138,7 @@ install_packages() {
 	pkgnames=("${install_pkgs[@]##*/}")
 
 	cp -- "${install_pkgs[@]}" "$copydir/root/"
-	arch-nspawn "$copydir" "${bindmounts_ro[@]}" "${bindmounts_rw[@]}" \
+	arch-nspawn "$copydir" "${bindmounts_ro[@]}" "${bindmounts_rw[@]}" "${bindmounts_tmpfs[@]}" \
 		pacman -U --noconfirm -- "${pkgnames[@]/#//root/}"
 	ret=$?
 	rm -- "${pkgnames[@]/#/$copydir/root/}"
@@ -274,11 +276,12 @@ move_products() {
 }
 # }}}
 
-while getopts 'hcur:I:l:nCTD:d:U:' arg; do
+while getopts 'hcur:I:l:nCTD:d:U:t:' arg; do
 	case "$arg" in
 		c) clean_first=1 ;;
 		D) bindmounts_ro+=("--bind-ro=$OPTARG") ;;
 		d) bindmounts_rw+=("--bind=$OPTARG") ;;
+		t) bindmounts_tmpfs+=("--tmpfs=$OPTARG") ;;
 		u) update_first=1 ;;
 		r) passeddir="$OPTARG" ;;
 		I) install_pkgs+=("$OPTARG") ;;
@@ -343,7 +346,7 @@ if [[ ! -d $copydir ]] || (( clean_first )); then
 fi
 
 (( update_first )) && arch-nspawn "$copydir" \
-		"${bindmounts_ro[@]}" "${bindmounts_rw[@]}" \
+		"${bindmounts_ro[@]}" "${bindmounts_rw[@]}" "${bindmounts_tmpfs[@]}" \
 		pacman -Syuu --noconfirm
 
 if [[ -n ${install_pkgs[*]:-} ]]; then
@@ -365,7 +368,7 @@ prepare_chroot
 if arch-nspawn "$copydir" \
 	--bind="${PWD//:/\\:}:/startdir" \
 	--bind="${SRCDEST//:/\\:}:/srcdest" \
-	"${bindmounts_ro[@]}" "${bindmounts_rw[@]}" \
+	"${bindmounts_ro[@]}" "${bindmounts_rw[@]}" "${bindmounts_tmpfs[@]}" \
 	/chrootbuild "${makepkg_args[@]}"
 then
 	mapfile -t pkgnames < <(sudo -u "$makepkg_user" bash -c 'source PKGBUILD; printf "%s\n" "${pkgname[@]}"')
