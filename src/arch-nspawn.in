@@ -60,10 +60,17 @@ nspawn_args=(
 	--directory="$working_dir"
 	--setenv="PATH=/usr/local/sbin:/usr/local/bin:/usr/bin"
 	--register=no
-	--slice="devtools-$(systemd-escape "${SUDO_USER:-$USER}")"
-	--machine="arch-nspawn-$$"
 	--as-pid2
 )
+
+if [[ ${DEVTOOLS_KEEP_UNIT:-0} == 1 ]]; then
+	nspawn_args+=(--keep-unit)
+else
+	nspawn_args+=(
+		--slice="devtools-$(systemd-escape "${SUDO_USER:-$USER}")"
+		--machine="arch-nspawn-$$"
+	)
+fi
 
 if (( ${#cache_dirs[@]} == 0 )); then
 	mapfile -t cache_dirs < <(pacman-conf --config "${pac_conf:-$working_dir/etc/pacman.conf}" CacheDir)
