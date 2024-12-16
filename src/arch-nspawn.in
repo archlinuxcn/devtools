@@ -56,10 +56,6 @@ shift 1
 
 [[ -z $working_dir ]] && die 'Please specify a working directory.'
 
-chroot_name="${working_dir##*/}"
-prefix_dir="${working_dir%/*}"
-prefix_name="${prefix_dir##*/}"
-machine_name="${prefix_name}-${chroot_name}"
 nspawn_args=(
 	--quiet
 	--directory="$working_dir"
@@ -68,14 +64,14 @@ nspawn_args=(
 	--as-pid2
 	--console=autopipe
 	--timezone=off
-	--machine="$(echo -n $machine_name | sed s/_/-/g)"
 )
 
 if grep -q '^0::/.*\.service$' /proc/self/cgroup; then
-	nspawn_args+=(--keep-unit)
+	nspawn_args+=(--keep-unit --machine="arch-nspawn-$$")
 else
 	nspawn_args+=(
 		--slice="devtools-$(systemd-escape "${SUDO_USER:-$USER}")"
+                --machine="arch-nspawn-$$"
 	)
 fi
 
